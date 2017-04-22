@@ -1,0 +1,227 @@
+<div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a
+
+        href="https://github.com/bighappyworld/email-verify#readme"
+
+    >email-verify (v0.1.1)</a>
+</h1>
+<h4>A tool to verify an email address exits via SMTP</h4>
+<div class="apidocSectionDiv"><a
+    href="#apidoc.tableOfContents"
+    id="apidoc.tableOfContents"
+><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.email-verify">module email-verify</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.email-verify.verify">
+            function <span class="apidocSignatureSpan">email-verify.</span>verify
+            <span class="apidocSignatureSpan">(email, options, callback)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <span class="apidocSignatureSpan">object <span class="apidocSignatureSpan">email-verify.</span>readfromfile</span>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.email-verify.readfromfile">module email-verify.readfromfile</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.email-verify.readfromfile.getAddressFromTextFile">
+            function <span class="apidocSignatureSpan">email-verify.readfromfile.</span>getAddressFromTextFile
+            <span class="apidocSignatureSpan">(filepath)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.email-verify" id="apidoc.module.email-verify">module email-verify</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.email-verify.verify" id="apidoc.element.email-verify.verify">
+        function <span class="apidocSignatureSpan">email-verify.</span>verify
+        <span class="apidocSignatureSpan">(email, options, callback)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function verify(email, options, callback){
+  let params = {}
+  let args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments))
+
+  args.forEach(function(arg){
+    if( typeof arg === &#x27;string&#x27; ){
+      params.email = arg
+    }
+    else if( typeof arg === &#x27;object&#x27; ){
+      params.options = arg
+    }
+    else if( typeof arg === &#x27;function&#x27; ){
+      params.callback = arg
+    }
+  })
+
+  if( !params.email &#x26;&#x26; params.options.email &#x26;&#x26; typeof params.options.email === &#x27;string&#x27; ) params.email = params.options.email
+  params.options = optionsDefaults(params.options)
+
+  if( !params.email ) throw new Error(errors.missing.email)
+  if( !params.options ) throw new Error(errors.missing.options)
+  if( !params.callback ) throw new Error(errors.missing.callback)
+
+  if( !validator.validate(params.email) ) return params.callback(null, { success: false, info: &#x27;Invalid Email Structure&#x27;, addr:
+email, params: params })
+
+  if( params.options.dns ) dnsConfig(params.options)
+
+  logger.info(&#x22;# Veryfing &#x22; + params.email)
+
+  startDNSQueries(params)
+
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+
+This module has tests with Mocha. Run `npm test` and make sure you have a solid connection.
+
+Use (also see the app.js file):
+
+```
+var verifier = require(&#x27;email-verify&#x27;);
+verifier.<span class="apidocCodeKeywordSpan">verify</span>( &#x27;anemail@domain.com&#x27;, function( err, info ){
+  if( err ) console.log(err);
+  else{
+    console.log( &#x22;Success (T/F): &#x22; + info.success );
+    console.log( &#x22;Info: &#x22; + info.info );
+  }
+});
+```
+...</pre></li>
+    </ul>
+
+
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.email-verify.readfromfile" id="apidoc.module.email-verify.readfromfile">module email-verify.readfromfile</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.email-verify.readfromfile.getAddressFromTextFile" id="apidoc.element.email-verify.readfromfile.getAddressFromTextFile">
+        function <span class="apidocSignatureSpan">email-verify.readfromfile.</span>getAddressFromTextFile
+        <span class="apidocSignatureSpan">(filepath)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">getAddressFromTextFile = function (filepath) {
+  let file = {
+    exist: true,
+    extension: require(&#x27;path&#x27;).extname(filepath),
+    content: &#x27;&#x27;
+  }
+
+  let extensionErrorMsg = &#x27;Sorry, you needed to put addresses list into plain text (*.txt) file. Separated each address by new line
+&#x27;
+
+  if(file.extension !== &#x27;.txt&#x27;) throw new Error(extensionErrorMsg)
+
+  try {
+    file.content = fs.readFileSync(filepath, &#x27;utf-8&#x27;)
+  }
+  catch (e) {
+    if (e.code === &#x27;ENOENT&#x27;) console.log(&#x27;File not found!&#x27;,e)
+    else console.log(&#x27;Error: &#x27;, e)
+    file.exist = false;
+  }
+  finally {
+
+    if (!file.exist) {
+      console.log(&#x27;Error, File not found!&#x27;)
+      return []
+    }
+    else {
+      let addressList = file.content.split(&#x27;\n&#x27;),
+          addressObject = {}
+
+      addressList.forEach((address)=&#x3e;{
+        if(address.length &#x3e; 0){
+          addressObject[address] = true
+        }
+      })
+
+      return Object.keys(addressObject)
+    }
+
+  }
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
